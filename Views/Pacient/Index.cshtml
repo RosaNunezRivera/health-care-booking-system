@@ -1,0 +1,197 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<center><h2>Pacients</h2></center>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#alertSuccess').hide();
+        $('#alertDanger').hide();
+        $('#spinner').hide();
+        loadData();
+    })
+
+    function loadData() {
+        $.ajax({
+            url: "/Pacient/GetPacients",
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                var html = '';
+                $.each(response, function (key, item) {
+                    html += '<tr>'
+                    html += '<td>' + item.PacientName + '</td>';
+                    html += '<td>' + item.Email + '</td>';
+                    html += '<td>' + item.PhoneNumber + '</td>';
+                    var dobDate = new Date(item.DOB);
+                    var formattedDate = dobDate.toLocaleDateString();
+                    html += '<td>' + formattedDate + '</td>';
+                    html += '<td><a href="#" onclick="return getPacientById(' + item.PacientName + ')">Edit</a> |<a href="#" onClick="Delete(' + item.PacientName + ')">Delete</a></td>';
+                    html += '</tr>'
+                });
+                $('.tbody').html(html);
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        })
+    }
+
+
+    function RegisterPacient() {
+        $('#spinner').show();
+        var pacientObj = {
+            PacientName: $('#pacientname').val(),
+            Email: $('#email').val(),
+            PhoneNumber: $('#phonenumber').val(),
+            DOB: $('#dob').val(),
+        };
+
+        $.ajax({
+            url: '/Pacient/RegisterPacient',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(pacientObj),
+            success: function (response) {
+                if (response == 'success') {
+                    loadData();
+                    $('#spinner').hide();
+                    $('#alertSuccess').show();
+                    $('#alertSuccess').text('Pacient has been successfully registered');
+                }
+                else {
+                    $('#spinner').hide();
+                    $('#alertDanger').show();
+                    $('#alertDanger').text('some error occured, try again!');
+                }
+            },
+            error: function (errormessage) {
+                $('#spinner').hide();
+                $('#alertDanger').show();
+                $('#alertDanger').text(errormessage.responseText);
+            }
+        });
+    }
+
+    function Delete(pacienteId) {
+        var ans = confirm('Are you sure you want to delete this pacient?');
+        if (ans) {
+            $.ajax({
+                url: "/Pacient/DeletePacient/" + pacienteId,
+                //data: JSON.stringify({ tripId: tripId }),
+                type: "POST",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    loadData();
+                },
+                error: function (errormessage) {
+                    if (errormessage.status == 401)
+                        alert('You are not authorized!');
+                }
+            });
+        }
+    }
+</script>
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" onclick="clearTextBoxes();">Add New Pacient</button>
+@*<p style="color:red" id="errorMessage"></p>*@
+
+<br />
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <td>Full Name</td>
+            <td>Email</td>
+            <td>Phone Number</td>
+            <td>Date of Birth</td>
+            <td>Action</td>
+        </tr>
+    </thead>
+    <tbody class="tbody">
+        @*Trip records will be populated here*@
+    </tbody>
+</table>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Add Trip</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form>
+
+                    <input type="hidden" id="pacientId" />
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="pacientname" placeholder="Pacient Name" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="email" class="form-control" id="email" placeholder="Email" />
+                            </div>
+                        </div>
+                    </div>
+                     <br />
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="phonenumber" placeholder="Phone Number" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="date" class="form-control" id="dob" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary" id="btnAdd" onclick="RegisterPacient();">Register</button>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="alert alert-success" id="alertSuccess"></div>
+                            <div class="alert alert-danger" id="alertDanger"></div>
+
+                        </div>
+                    </div>
+                </form>
+
+                <center>
+                    <div class="spinner-border" role="status" id="spinner">
+                    </div>
+                </center>
+       </div>
+    </div>
+</div>
