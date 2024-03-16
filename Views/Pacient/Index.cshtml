@@ -1,9 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-<center><h2>Pacients</h2></center>
+﻿<center><h2>Pacients</h2></center>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -11,30 +6,29 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
+        loadData();
         $('#alertSuccess').hide();
         $('#alertDanger').hide();
         $('#spinner').hide();
-        loadData();
-    })
+    });
 
     function loadData() {
         $.ajax({
-            url: "/Pacient/GetPacients",
+            url: '/Pacient/GetPacients',
             type: "GET",
-            contentType: "application/json",
-            dataType: "json",
+            contentType: 'application/json',
+            dataType: 'json',
             success: function (response) {
-                console.log(response);
                 var html = '';
-                $.each(response, function (key, item) {
+                $.each(response, function(key, item) {
                     html += '<tr>'
-                    html += '<td>' + item.PacientName + '</td>';
-                    html += '<td>' + item.Email + '</td>';
-                    html += '<td>' + item.PhoneNumber + '</td>';
-                    var dobDate = new Date(item.DOB);
+                    html += '<td>' + item.pacientName + '</td>';
+                    html += '<td>' + item.email + '</td>';
+                    html += '<td>' + item.phoneNumber + '</td>';
+                    var dobDate = new Date(item.dob);
                     var formattedDate = dobDate.toLocaleDateString();
                     html += '<td>' + formattedDate + '</td>';
-                    html += '<td><a href="#" onclick="return getPacientById(' + item.PacientName + ')">Edit</a> |<a href="#" onClick="Delete(' + item.PacientName + ')">Delete</a></td>';
+                    html += '<td><a href="#" onclick="return getPacientById(' + item.pacientID + ')">Edit</a> |<a href="#" onClick="Delete(' + item.pacientID + ')">Delete</a></td>';
                     html += '</tr>'
                 });
                 $('.tbody').html(html);
@@ -42,17 +36,19 @@
             error: function (errormessage) {
                 alert(errormessage.responseText);
             }
-        })
+        });
     }
 
-
     function RegisterPacient() {
+        $('#alertSuccess').hide();
+        $('#alertDanger').hide();
+
         $('#spinner').show();
         var pacientObj = {
             PacientName: $('#pacientname').val(),
             Email: $('#email').val(),
             PhoneNumber: $('#phonenumber').val(),
-            DOB: $('#dob').val(),
+            DOB: $('#dateob').val(),
         };
 
         $.ajax({
@@ -81,24 +77,125 @@
         });
     }
 
-    function Delete(pacienteId) {
-        var ans = confirm('Are you sure you want to delete this pacient?');
-        if (ans) {
-            $.ajax({
-                url: "/Pacient/DeletePacient/" + pacienteId,
-                //data: JSON.stringify({ tripId: tripId }),
-                type: "POST",
-                contentType: "application/json;charset=UTF-8",
-                dataType: "json",
-                success: function (response) {
-                    loadData();
-                },
-                error: function (errormessage) {
-                    if (errormessage.status == 401)
-                        alert('You are not authorized!');
-                }
-            });
+    function Update() {
+        $('#alertSuccess').hide();
+        $('#alertDanger').hide();
+        $('#spinner').hide();
+
+        var pacObj = {
+            PacientID: $('#pacid').val(),
+            PacientName: $('#pacientname').val(),
+            Email: $('#email').val(),
+            PhoneNumber: $('#phonenumber').val(),
+            DOB: $('#dateob').val()
         }
+        console.log(pacObj);
+        console.log("Value-->" + $('#pacid').val()); //no imprime ningun valor 
+
+        $.ajax({
+            url: "/Pacient/UpdatePacient/",
+            data: JSON.stringify(pacObj),
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response) {
+
+                if (response == 'success') {
+                    loadData();
+                    $('#myModal').modal('hide');
+                    $('.modal-backdrop').remove();
+                }
+                else {
+                    $('#errorMessage').text('Name, email, phone number and date of birth are required!');
+                }
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        })
+    }
+
+
+    function Delete(pacientIdToDelete) {
+        $('#myModalDelete').modal('show');
+        $('.modal-backdrop').show();
+        $('#btnDelete').data('pacientid', pacientIdToDelete);
+    }
+   
+
+    function getPacientById(pacid) {
+        $('#alertSuccess').hide();
+        $('#alertDanger').hide();
+        $('#spinner').hide();
+
+        $.ajax({
+            url: "/Pacient/GetPacientById/" + pacid, //Pass the parameter directly when is GET
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response) {
+                $('#pacid').val(response.pacientID);
+                $('#pacientname').val(response.pacientName);
+                $('#email').val(response.email);
+                $('#phonenumber').val(response.phoneNumber);
+
+                var dateOfBirth = new Date(response.dob); // Convert the string to a Date object
+                var formattedDate = dateOfBirth.toISOString().split('T')[0];// Format the date to display only the date (without the time)
+                $('#dateob').val(formattedDate);
+
+                $('#myModal').modal('show');
+                $('#btnUpdate').show();
+
+                $('#btnAdd').hide();
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        })
+    }
+
+    function DeletePacient() {
+        var pacId = $('#btnDelete').data('pacientid');
+        $.ajax({
+            url: "/Pacient/DeletePacient/",
+            data: JSON.stringify(pacId),
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response) {
+                if (response == 'success') {
+                    $('#myModalDelete').modal('hide');
+                    $('.modal-backdrop').remove();
+                    loadData();
+                }
+                else {
+                    $('#spinner').hide();
+                    $('#alertDanger').show();
+                    $('#alertDanger').text('some error occured, try again!');
+                }
+            },
+            error: function (errormessage) {
+                if (errormessage.status == 401)
+                    alert('You are not authorized!');
+            }
+        });
+    }
+
+    function CloseDeleteModal() {
+        $('#myModalDelete').modal('hide');
+        $('.modal-backdrop').remove();
+    }
+
+    function clearTextBoxes() {
+        $('#pacientname').val("");
+        $('#email').val("");
+        $('#phonenumber').val("");
+        $('#dateob').val("");
+      
+        $('#btnUpdate').hide();
+        $('#alertSuccess').hide();
+        $('#alertDanger').hide()
+        $('#btnAdd').show();
     }
 </script>
 
@@ -109,15 +206,15 @@
 <table class="table table-bordered table-hover">
     <thead>
         <tr>
-            <td>Full Name</td>
-            <td>Email</td>
-            <td>Phone Number</td>
-            <td>Date of Birth</td>
-            <td>Action</td>
+            <td><center>Full Name</center></td>
+            <td><center>Email</center></td>
+            <td><center>Phone Number</center></td>
+            <td><center>Date of Birth</center></td>
+            <td><center>Action</center></td>
         </tr>
     </thead>
     <tbody class="tbody">
-        @*Trip records will be populated here*@
+        @*Pacients records will be populated here*@
     </tbody>
 </table>
 
@@ -126,14 +223,15 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h4 class="modal-title">Add Trip</h4>
+                <h4>Pacient</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body">
                 <form>
+                    
+                    <input type="hidden" id="pacid" />
 
-                    <input type="hidden" id="pacientId" />
                     <div class="row justify-content-center">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -150,7 +248,7 @@
                             </div>
                         </div>
                     </div>
-                     <br />
+                    <br />
 
                     <div class="row justify-content-center">
                         <div class="col-md-6">
@@ -164,7 +262,7 @@
                     <div class="row justify-content-center">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="date" class="form-control" id="dob" />
+                                <input type="date" class="form-control" id="dateob" />
                             </div>
                         </div>
                     </div>
@@ -174,6 +272,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <button type="button" class="btn btn-primary" id="btnAdd" onclick="RegisterPacient();">Register</button>
+                                <button type="button" class="btn btn-primary" id="btnUpdate" onclick="return Update();">Update</button>
                             </div>
                         </div>
                     </div>
@@ -192,6 +291,36 @@
                     <div class="spinner-border" role="status" id="spinner">
                     </div>
                 </center>
-       </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title">Delete Pacient</h4>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <p>Are you sure want to delete this Pacient?</p>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-outline-primary" id="btnDelete" onClick="DeletePacient()">Delete</button>
+                                <button type="button" class="btn btn-outline-secondary" id="btnCloseModalDelete" onclick="return CloseDeleteModal()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <p style="color:red" id="errorMessage"></p>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
