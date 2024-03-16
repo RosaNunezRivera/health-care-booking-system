@@ -1,4 +1,5 @@
-﻿using BBLL;
+using Azure;
+using BBLL;
 using BEntities.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,9 +14,9 @@ namespace PatientBookingWebApplication.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetPacients() 
+        public IActionResult GetPacients()
         {
-            var response = pacientService.GetPacientsService();
+            var response = pacientService.GetAllPacientsService();
             return Json(response);
         }
 
@@ -26,5 +27,33 @@ namespace PatientBookingWebApplication.Controllers
             return Json(response);
         }
 
+        [HttpGet]
+        public IActionResult GetPacientById(int id)
+        {
+            var pacById = pacientService.GetPacientByIdService(id);
+
+            return Json(pacById);
+        }
+
+        [HttpPost]
+        public IActionResult UpdatePacient([FromBody] Pacient pacientFormData)
+        {
+            var pacientToUpdated = pacientService.UpdatePacientService(pacientFormData);
+            return Json(pacientToUpdated);
+        }
+
+        [HttpPost]
+        public IActionResult DeletePacient([FromBody] int pacId)
+        {
+            try
+            {
+                var response = pacientService.DeletePacientService(pacId);
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return Json("error");
+            }
+        }
     }
 }
