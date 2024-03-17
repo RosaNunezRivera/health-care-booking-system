@@ -27,19 +27,19 @@ namespace BEntities.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Pacients",
+                name: "Patients",
                 columns: table => new
                 {
-                    PacientID = table.Column<int>(type: "int", nullable: false)
+                    PatientID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PacientName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    PatientName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     DOB = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Pacients", x => x.PacientID);
+                    table.PrimaryKey("PK_Patients", x => x.PatientID);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,7 +68,7 @@ namespace BEntities.Migrations
                 {
                     BookingID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BookingPacientID = table.Column<int>(type: "int", nullable: false),
+                    BookingPatientID = table.Column<int>(type: "int", nullable: false),
                     BookingDoctorID = table.Column<int>(type: "int", nullable: false),
                     BookingAvailabilityId = table.Column<int>(type: "int", nullable: false),
                     BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -95,10 +95,10 @@ namespace BEntities.Migrations
                         principalTable: "Doctors",
                         principalColumn: "DoctorID");
                     table.ForeignKey(
-                        name: "FK_Bookings_Pacients_BookingPacientID",
-                        column: x => x.BookingPacientID,
-                        principalTable: "Pacients",
-                        principalColumn: "PacientID",
+                        name: "FK_Bookings_Patients_BookingPatientID",
+                        column: x => x.BookingPatientID,
+                        principalTable: "Patients",
+                        principalColumn: "PatientID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -118,9 +118,9 @@ namespace BEntities.Migrations
                 column: "BookingDoctorID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_BookingPacientID",
+                name: "IX_Bookings_BookingPatientID",
                 table: "Bookings",
-                column: "BookingPacientID");
+                column: "BookingPatientID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_DoctorID",
@@ -138,7 +138,7 @@ namespace BEntities.Migrations
                 name: "Availabilities");
 
             migrationBuilder.DropTable(
-                name: "Pacients");
+                name: "Patients");
 
             migrationBuilder.DropTable(
                 name: "Doctors");

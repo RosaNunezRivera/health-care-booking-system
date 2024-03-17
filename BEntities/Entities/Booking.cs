@@ -13,8 +13,8 @@ namespace BEntities.Entities
         [Key]
         public int BookingID { get; set; }
 
-        [ForeignKey("Pacient")]
-        public int BookingPacientID { get; set; }
+        [ForeignKey("Patient")]
+        public int BookingPatientID { get; set; }
 
         [ForeignKey("Doctor")]
         public int BookingDoctorID { get; set; }
@@ -25,7 +25,7 @@ namespace BEntities.Entities
         public DateTime BookingDate {  get; set; }
 
         // lazy loading of entities in EF
-        public virtual Pacient Pacient { get; set; }
+        public virtual Patient Patient { get; set; }
 
         public virtual Doctor Doctor { get; set; }
 

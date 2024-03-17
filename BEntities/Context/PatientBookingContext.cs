@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace BEntities.Context
 {
-    public class PacientBookingContext : DbContext
+    public class PatientBookingContext : DbContext
     {
-        public PacientBookingContext() : base()
+        public PatientBookingContext() : base()
         {
 
         }
@@ -21,7 +21,7 @@ namespace BEntities.Context
         }
 
         //To create the tables
-        public DbSet<Pacient> Pacients { get; set; }
+        public DbSet<Patient> Patients { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Availability> Availabilities { get; set; }
         public DbSet<Booking> Bookings { get; set; }

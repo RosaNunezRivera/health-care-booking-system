@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace BEntities.Entities
 {
-    public class Pacient
+    public class Patient
     {
         [Key]
-        public int PacientID { get; set; }
+        public int PatientID { get; set; }
 
         [MaxLength(50)]
-        public string PacientName { get; set; }
+        public string PatientName { get; set; }
 
         [MaxLength(50)]
         public string Email { get; set; }
