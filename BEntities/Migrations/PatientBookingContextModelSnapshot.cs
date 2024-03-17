@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BEntities.Migrations
 {
-    [DbContext(typeof(PacientBookingContext))]
-    partial class PacientBookingContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(PatientBookingContext))]
+    partial class PatientBookingContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -61,7 +61,7 @@ namespace BEntities.Migrations
                     b.Property<int>("BookingDoctorID")
                         .HasColumnType("int");
 
-                    b.Property<int>("BookingPacientID")
+                    b.Property<int>("BookingPatientID")
                         .HasColumnType("int");
 
                     b.Property<int?>("DoctorID")
@@ -73,7 +73,7 @@ namespace BEntities.Migrations
 
                     b.HasIndex("BookingDoctorID");
 
-                    b.HasIndex("BookingPacientID");
+                    b.HasIndex("BookingPatientID");
 
                     b.HasIndex("DoctorID");
 
@@ -108,13 +108,13 @@ namespace BEntities.Migrations
                     b.ToTable("Doctors");
                 });
 
-            modelBuilder.Entity("BEntities.Entities.Pacient", b =>
+            modelBuilder.Entity("BEntities.Entities.Patient", b =>
                 {
-                    b.Property<int>("PacientID")
+                    b.Property<int>("PatientID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PacientID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PatientID"));
 
                     b.Property<DateTime>("DOB")
                         .HasColumnType("datetime2");
@@ -124,7 +124,7 @@ namespace BEntities.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("PacientName")
+                    b.Property<string>("PatientName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -134,9 +134,9 @@ namespace BEntities.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("PacientID");
+                    b.HasKey("PatientID");
 
-                    b.ToTable("Pacients");
+                    b.ToTable("Patients");
                 });
 
             modelBuilder.Entity("BEntities.Entities.Availability", b =>
@@ -162,9 +162,9 @@ namespace BEntities.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("BEntities.Entities.Pacient", "Pacient")
+                    b.HasOne("BEntities.Entities.Patient", "Patient")
                         .WithMany("Bookings")
-                        .HasForeignKey("BookingPacientID")
+                        .HasForeignKey("BookingPatientID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -176,7 +176,7 @@ namespace BEntities.Migrations
 
                     b.Navigation("Doctor");
 
-                    b.Navigation("Pacient");
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("BEntities.Entities.Availability", b =>
@@ -191,7 +191,7 @@ namespace BEntities.Migrations
                     b.Navigation("Bookings");
                 });
 
-            modelBuilder.Entity("BEntities.Entities.Pacient", b =>
+            modelBuilder.Entity("BEntities.Entities.Patient", b =>
                 {
                     b.Navigation("Bookings");
                 });

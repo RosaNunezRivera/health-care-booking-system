@@ -1,4 +1,4 @@
-﻿<center><h2>Pacients</h2></center>
+﻿<center><h2>Patients</h2></center>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -14,7 +14,7 @@
 
     function loadData() {
         $.ajax({
-            url: '/Pacient/GetPacients',
+            url: '/Patient/GetPatients',
             type: "GET",
             contentType: 'application/json',
             dataType: 'json',
@@ -22,13 +22,13 @@
                 var html = '';
                 $.each(response, function(key, item) {
                     html += '<tr>'
-                    html += '<td>' + item.pacientName + '</td>';
+                    html += '<td>' + item.patientName + '</td>';
                     html += '<td>' + item.email + '</td>';
                     html += '<td>' + item.phoneNumber + '</td>';
                     var dobDate = new Date(item.dob);
                     var formattedDate = dobDate.toLocaleDateString();
                     html += '<td>' + formattedDate + '</td>';
-                    html += '<td><a href="#" onclick="return getPacientById(' + item.pacientID + ')">Edit</a> |<a href="#" onClick="Delete(' + item.pacientID + ')">Delete</a></td>';
+                    html += '<td><a href="#" onclick="return getPatientById(' + item.patientID + ')">Edit</a> |<a href="#" onClick="Delete(' + item.patientID + ')">Delete</a></td>';
                     html += '</tr>'
                 });
                 $('.tbody').html(html);
@@ -39,29 +39,29 @@
         });
     }
 
-    function RegisterPacient() {
+    function RegisterPatient() {
         $('#alertSuccess').hide();
         $('#alertDanger').hide();
 
         $('#spinner').show();
-        var pacientObj = {
-            PacientName: $('#pacientname').val(),
+        var patientObj = {
+            PatientName: $('#patientName').val(),
             Email: $('#email').val(),
-            PhoneNumber: $('#phonenumber').val(),
-            DOB: $('#dateob').val(),
+            PhoneNumber: $('#phoneNumber').val(),
+            DOB: $('#dateOfBirth').val(),
         };
 
         $.ajax({
-            url: '/Pacient/RegisterPacient',
+            url: '/Patient/RegisterPatient',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify(pacientObj),
+            data: JSON.stringify(patientObj),
             success: function (response) {
                 if (response == 'success') {
                     loadData();
                     $('#spinner').hide();
                     $('#alertSuccess').show();
-                    $('#alertSuccess').text('Pacient has been successfully registered');
+                    $('#alertSuccess').text('Patient has been successfully registered');
                 }
                 else {
                     $('#spinner').hide();
@@ -82,19 +82,19 @@
         $('#alertDanger').hide();
         $('#spinner').hide();
 
-        var pacObj = {
-            PacientID: $('#pacid').val(),
-            PacientName: $('#pacientname').val(),
+        var patObj = {
+            PatientID: $('#patID').val(),
+            PatientName: $('#patientName').val(),
             Email: $('#email').val(),
-            PhoneNumber: $('#phonenumber').val(),
-            DOB: $('#dateob').val()
+            PhoneNumber: $('#phoneNumber').val(),
+            DOB: $('#dateOfBirth').val()
         }
-        console.log(pacObj);
-        console.log("Value-->" + $('#pacid').val()); //no imprime ningun valor 
+        console.log(patObj);
+        console.log("Value-->" + $('#patID').val()); //no imprime ningun valor 
 
         $.ajax({
-            url: "/Pacient/UpdatePacient/",
-            data: JSON.stringify(pacObj),
+            url: "/Patient/UpdatePatient/",
+            data: JSON.stringify(patObj),
             type: "POST",
             contentType: "application/json",
             dataType: "json",
@@ -116,32 +116,32 @@
     }
 
 
-    function Delete(pacientIdToDelete) {
+    function Delete(patientIdToDelete) {
         $('#myModalDelete').modal('show');
         $('.modal-backdrop').show();
-        $('#btnDelete').data('pacientid', pacientIdToDelete);
+        $('#btnDelete').data('patientid', patientIdToDelete);
     }
    
 
-    function getPacientById(pacid) {
+    function getPatientById(patID) {
         $('#alertSuccess').hide();
         $('#alertDanger').hide();
         $('#spinner').hide();
 
         $.ajax({
-            url: "/Pacient/GetPacientById/" + pacid, //Pass the parameter directly when is GET
+            url: "/Patient/GetPatientById/" + patID, //Pass the parameter directly when is GET
             type: "GET",
             contentType: "application/json",
             dataType: "json",
             success: function (response) {
-                $('#pacid').val(response.pacientID);
-                $('#pacientname').val(response.pacientName);
+                $('#patID').val(response.patientID);
+                $('#patientName').val(response.patientName);
                 $('#email').val(response.email);
-                $('#phonenumber').val(response.phoneNumber);
+                $('#phoneNumber').val(response.phoneNumber);
 
                 var dateOfBirth = new Date(response.dob); // Convert the string to a Date object
                 var formattedDate = dateOfBirth.toISOString().split('T')[0];// Format the date to display only the date (without the time)
-                $('#dateob').val(formattedDate);
+                $('#dateOfBirth').val(formattedDate);
 
                 $('#myModal').modal('show');
                 $('#btnUpdate').show();
@@ -154,11 +154,11 @@
         })
     }
 
-    function DeletePacient() {
-        var pacId = $('#btnDelete').data('pacientid');
+    function DeletePatient() {
+        var patID = $('#btnDelete').data('patientid');
         $.ajax({
-            url: "/Pacient/DeletePacient/",
-            data: JSON.stringify(pacId),
+            url: "/Patient/DeletePatient/",
+            data: JSON.stringify(patID),
             type: "POST",
             contentType: "application/json",
             dataType: "json",
@@ -187,10 +187,10 @@
     }
 
     function clearTextBoxes() {
-        $('#pacientname').val("");
+        $('#patientName').val("");
         $('#email').val("");
-        $('#phonenumber').val("");
-        $('#dateob').val("");
+        $('#phoneNumber').val("");
+        $('#dateOfBirth').val("");
       
         $('#btnUpdate').hide();
         $('#alertSuccess').hide();
@@ -199,7 +199,7 @@
     }
 </script>
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" onclick="clearTextBoxes();">Add New Pacient</button>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" onclick="clearTextBoxes();">Add New Patient</button>
 @*<p style="color:red" id="errorMessage"></p>*@
 
 <br />
@@ -214,7 +214,7 @@
         </tr>
     </thead>
     <tbody class="tbody">
-        @*Pacients records will be populated here*@
+        @*Patients records will be populated here*@
     </tbody>
 </table>
 
@@ -223,19 +223,19 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h4>Pacient</h4>
+                <h4>Patient</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body">
                 <form>
                     
-                    <input type="hidden" id="pacid" />
+                    <input type="hidden" id="patID" />
 
                     <div class="row justify-content-center">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="text" class="form-control" id="pacientname" placeholder="Pacient Name" />
+                                <input type="text" class="form-control" id="patientName" placeholder="Patient Name" />
                             </div>
                         </div>
                     </div>
@@ -253,7 +253,7 @@
                     <div class="row justify-content-center">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="text" class="form-control" id="phonenumber" placeholder="Phone Number" />
+                                <input type="text" class="form-control" id="phoneNumber" placeholder="Phone Number" />
                             </div>
                         </div>
                     </div>
@@ -262,7 +262,7 @@
                     <div class="row justify-content-center">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="date" class="form-control" id="dateob" />
+                                <input type="date" class="form-control" id="dateOfBirth" />
                             </div>
                         </div>
                     </div>
@@ -271,7 +271,7 @@
                     <div class="row justify-content-center">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <button type="button" class="btn btn-primary" id="btnAdd" onclick="RegisterPacient();">Register</button>
+                                <button type="button" class="btn btn-primary" id="btnAdd" onclick="RegisterPatient();">Register</button>
                                 <button type="button" class="btn btn-primary" id="btnUpdate" onclick="return Update();">Update</button>
                             </div>
                         </div>
@@ -301,7 +301,7 @@
         <div class="modal-content">
             <div class="modal-header">
 
-                <h4 class="modal-title">Delete Pacient</h4>
+                <h4 class="modal-title">Delete Patient</h4>
 
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -310,9 +310,9 @@
                 <form>
                     <div class="row justify-content-center">
                         <div class="col-md-6">
-                            <p>Are you sure want to delete this Pacient?</p>
+                            <p>Are you sure want to delete this Patient?</p>
                             <div class="form-group">
-                                <button type="button" class="btn btn-outline-primary" id="btnDelete" onClick="DeletePacient()">Delete</button>
+                                <button type="button" class="btn btn-outline-primary" id="btnDelete" onClick="DeletePatient()">Delete</button>
                                 <button type="button" class="btn btn-outline-secondary" id="btnCloseModalDelete" onclick="return CloseDeleteModal()">Cancel</button>
                             </div>
                         </div>
